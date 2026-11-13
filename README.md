@@ -10,9 +10,15 @@ letters turn green (right place), orange (wrong place) or black (not in the word
 
 ## Install on Android
 
-1. Open the game's GitHub Pages address in Chrome.
-2. Tap the menu (three dots), then **Add to Home screen** / **Install app**.
-3. Open it from the home screen. After the first load it needs no connection.
+1. On the phone, download
+   [wordguess.apk](https://github.com/paulmatthis/wordguess/releases/latest/download/wordguess.apk).
+2. Open the downloaded file and allow your browser to install apps when asked.
+3. Open **Word Guess** from the app drawer. It needs no connection, ever.
+
+To update, download and open the newest APK the same way; statistics are kept.
+The APK is rebuilt by GitHub (`.github/workflows/apk.yml`, `android/`) whenever
+the game in `docs/` changes. The game also runs in a browser at
+<https://paulmatthis.github.io/wordguess/>.
 
 ## Where the idea came from
 
