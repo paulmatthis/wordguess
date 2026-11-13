@@ -337,5 +337,5 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     if (hadVersion) location.reload();
   });
-  navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(reg => reg.update());
+  navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(reg => reg.update()).catch(() => {});
 }

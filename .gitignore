@@ -2,3 +2,5 @@
 *Engaging Data.html
 .DS_Store
 __pycache__/
+android/build/
+android/keystore/
