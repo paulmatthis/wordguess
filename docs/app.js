@@ -331,5 +331,11 @@ if (S.game && answers[S.game.n]) { renderAll(); loadDict(S.game.n); }
 else { S.game = null; renderAll(); openStart(); }
 
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-  navigator.serviceWorker.register('sw.js');
+  // When a new version has been downloaded, switch to it straight away
+  // (the game in progress is saved, so nothing is lost).
+  const hadVersion = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (hadVersion) location.reload();
+  });
+  navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(reg => reg.update());
 }
