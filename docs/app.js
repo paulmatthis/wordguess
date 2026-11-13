@@ -2,6 +2,7 @@
 
 const LENGTHS = [3, 4, 5, 6, 7];
 const MAX_GUESSES = 6;
+const WIN_STEP = 110, WIN_FLIP = 420; // ms: the winning row turns over slowly
 const STORE = 'wordguess.v1';
 const $ = id => document.getElementById(id);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -77,11 +78,12 @@ function renderBoard(opt = {}) {
     const word = done ? g.guesses[r] : active ? g.cur : '';
     const marks = done ? score(word, g.answer) : null;
     const flip = opt.reveal && r === g.guesses.length - 1;
+    const step = flip && g.won ? WIN_STEP : 25;
     html += `<div class="row${active ? ' active' + (opt.shake ? ' shake' : '') : ''}">`;
     for (let i = 0; i < g.n; i++) {
       let cls = 'tile', style = '';
       if (marks) cls += ' ' + marks[i];
-      if (flip) { cls += ' flip'; style = ` style="animation-delay:${i * 25}ms"`; }
+      if (flip) { cls += g.won ? ' flip win' : ' flip'; style = ` style="animation-delay:${i * step}ms"`; }
       if (active && opt.pop && i === word.length - 1) cls += ' pop';
       html += `<div class="${cls}"${style}>${word[i] || ''}</div>`;
     }
@@ -97,8 +99,8 @@ function buildKeyboard() {
     `<div class="krow${i === 1 ? ' inset' : i === 2 ? ' wide' : ''}">` +
     [...row].map(k => `<button class="key" data-k="${k}">${k.toUpperCase()}</button>`).join('') +
     '</div>').join('') +
-    '<div class="krow"><button class="key" data-k="back">Delete</button>' +
-    '<button class="key" data-k="enter">Enter</button></div>';
+    '<div class="krow"><button class="key" data-k="enter">Enter</button>' +
+    '<button class="key" data-k="back">Delete</button></div>';
   // pointerdown (not click) so fast two-thumb typing never drops a letter
   kb.addEventListener('pointerdown', e => {
     const key = e.target.closest('.key');
@@ -121,20 +123,46 @@ function renderKeys() {
   }
 }
 
-function renderFooter() {
-  const g = S.game, over = !!(g && g.done);
-  kb.hidden = over;
-  $('result').hidden = !over;
-  if (over) {
-    $('resTitle').textContent = g.won
-      ? `Solved in ${g.guesses.length} of ${MAX_GUESSES}`
-      : 'Out of guesses. The word was';
-    $('resWord').textContent = g.answer;
-  }
-  fit();
+const dResult = $('dResult');
+function showResult() {
+  const g = S.game;
+  if (!g || !g.done || dResult.open) return;
+  $('resTitle').textContent = g.won
+    ? `Solved in ${g.guesses.length} of ${MAX_GUESSES}`
+    : 'Out of guesses. The word was';
+  $('resWord').textContent = g.answer;
+  $('bShare').textContent = 'Share';
+  dResult.showModal();
 }
 
-function renderAll() { renderBoard(); renderKeys(); renderFooter(); }
+function renderAll() {
+  renderBoard();
+  renderKeys();
+  if (S.game && S.game.done) showResult();
+  else if (dResult.open) dResult.close();
+}
+
+// A short, small burst of confetti from the winning row.
+function confetti(row) {
+  if (!row || !row.animate || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const box = row.getBoundingClientRect();
+  const colors = ['#2e9e4f', '#e8a317', '#4f8ef7', '#e5484d', '#f4f4f5'];
+  for (let i = 0; i < 28; i++) {
+    const bit = document.createElement('i');
+    bit.className = 'confetti';
+    bit.style.left = box.left + Math.random() * box.width + 'px';
+    bit.style.top = box.top + box.height / 2 + 'px';
+    bit.style.background = colors[i % colors.length];
+    document.body.appendChild(bit);
+    const dx = (Math.random() - 0.5) * 140, up = 40 + Math.random() * 70, spin = (Math.random() - 0.5) * 900;
+    bit.animate([
+      { transform: 'translate(0, 0) rotate(0)', opacity: 1, easing: 'ease-out' },
+      { transform: `translate(${dx * 0.6}px, ${-up}px) rotate(${spin * 0.5}deg)`, opacity: 1, offset: 0.4, easing: 'ease-in' },
+      { transform: `translate(${dx}px, ${up * 0.6}px) rotate(${spin}deg)`, opacity: 0 },
+    ], { duration: 650 + Math.random() * 250, delay: Math.random() * 60, fill: 'both' })
+      .onfinish = () => bit.remove();
+  }
+}
 
 let toastTimer;
 function toast(msg, ms = 1600) {
@@ -148,7 +176,8 @@ function toast(msg, ms = 1600) {
 // ---------- playing ----------
 function press(k) {
   const g = S.game;
-  if (!g || g.done || busy) return;
+  if (!g || busy) return;
+  if (g.done) return showResult(); // popup was dismissed: any key brings it back
   if (k === 'enter') return void submit();
   if (k === 'back') {
     if (!g.cur) return;
@@ -167,7 +196,7 @@ async function submit() {
   const reject = msg => { toast(msg); renderBoard({ shake: true }); };
   if (g.cur.length < g.n) return reject('Not enough letters');
   const dict = await loadDict(g.n);
-  if (dict && !dict.has(g.cur)) return reject('Not in word list');
+  if (dict && !dict.has(g.cur)) return reject('Not a valid guess');
 
   const guess = g.cur;
   g.guesses.push(guess);
@@ -179,11 +208,14 @@ async function submit() {
 
   busy = true;
   renderBoard({ reveal: true });
-  await sleep(g.n * 25 + 180);
+  await sleep(g.won ? (g.n - 1) * WIN_STEP + WIN_FLIP : g.n * 25 + 180);
+  if (S.game === g) renderKeys();
+  if (S.game === g && g.done) {
+    if (g.won) confetti(board.children[g.guesses.length - 1]);
+    await sleep(g.won ? 750 : 350);
+  }
   busy = false;
-  if (S.game !== g) return;
-  renderKeys();
-  renderFooter();
+  if (S.game === g) showResult();
 }
 
 function record(g) {
@@ -297,12 +329,43 @@ $('bStats').addEventListener('click', () => {
   $('dStats').showModal();
 });
 
+// ---------- updates ----------
+// The Android app only goes online here, when this button is tapped: it asks
+// GitHub for the number of the newest release and compares it with its own.
+const REPO = 'paulmatthis/wordguess';
+const VERSION = typeof APP_VERSION === 'number' ? APP_VERSION : 0;
+$('verText').textContent = VERSION ? `Version 1.${VERSION}` : 'Browser version';
+
+$('bUpdate').addEventListener('click', async () => {
+  const out = $('updNote');
+  out.textContent = 'Checking…';
+  try {
+    if (!VERSION) { // browser copy: the service worker fetches new files itself
+      const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
+      if (reg) await reg.update();
+      out.textContent = 'The browser version updates itself. Reload the page to be sure you have the newest.';
+      return;
+    }
+    const res = await fetch(`https://api.github.com/repos/${REPO}/releases/latest`, { cache: 'no-store' });
+    if (!res.ok) throw new Error(res.status);
+    const latest = +(/^v1\.(\d+)$/.exec((await res.json()).tag_name) || [])[1];
+    if (!latest) throw new Error('unexpected release name');
+    if (latest > VERSION) {
+      out.innerHTML = `Version 1.${latest} is available. ` +
+        `<a href="https://github.com/${REPO}/releases/latest/download/wordguess.apk" target="_blank" rel="noopener">Download</a>` +
+        ', then open the file to install.';
+    } else out.textContent = 'You have the latest version.';
+  } catch (e) {
+    out.textContent = 'Could not check. Is the phone online?';
+  }
+});
+
 // ---------- other buttons ----------
-$('bInfo').addEventListener('click', () => $('dInfo').showModal());
+$('bInfo').addEventListener('click', () => { $('updNote').textContent = ''; $('dInfo').showModal(); });
 $('bNew').addEventListener('click', openStart);
-$('bAgain').addEventListener('click', newGame);
+$('bAgain').addEventListener('click', () => { dResult.close(); newGame(); });
 for (const b of document.querySelectorAll('[data-close]')) b.addEventListener('click', () => b.closest('dialog').close());
-for (const d of [$('dInfo'), $('dStats')]) d.addEventListener('click', e => { if (e.target === d) d.close(); });
+for (const d of [$('dInfo'), $('dStats'), dResult]) d.addEventListener('click', e => { if (e.target === d) d.close(); });
 
 $('bShare').addEventListener('click', async () => {
   const g = S.game;
@@ -311,7 +374,7 @@ $('bShare').addEventListener('click', async () => {
     g.guesses.map(w => score(w, g.answer).map(m => squares[m]).join('')).join('\n');
   try {
     if (navigator.share) await navigator.share({ text });
-    else { await navigator.clipboard.writeText(text); toast('Copied to clipboard'); }
+    else { await navigator.clipboard.writeText(text); $('bShare').textContent = 'Copied'; }
   } catch (e) { /* share sheet dismissed */ }
 });
 

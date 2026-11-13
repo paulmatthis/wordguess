@@ -31,18 +31,17 @@
   <main id="wrap"><div id="board" aria-label="Guesses"></div></main>
   <div id="toast" role="status" aria-live="polite"></div>
 
-  <footer>
-    <div id="kb"></div>
-    <div id="result" hidden>
-      <div id="resTitle"></div>
-      <div id="resWord"></div>
-      <div class="actions">
-        <button id="bShare" class="btn">Share</button>
-        <button id="bAgain" class="btn primary">New game</button>
-      </div>
-    </div>
-  </footer>
+  <footer><div id="kb"></div></footer>
 </div>
+
+<dialog id="dResult">
+  <div id="resTitle"></div>
+  <div id="resWord"></div>
+  <div class="actions">
+    <button id="bShare" class="btn">Share</button>
+    <button id="bAgain" class="btn primary">New game</button>
+  </div>
+</dialog>
 
 <dialog id="dStart">
   <h2>New game</h2>
@@ -77,6 +76,11 @@
   <p><span class="tile mini p">O</span> right letter, wrong place</p>
   <p><span class="tile mini a">B</span> letter is not in the word</p>
   <p class="note">Letters can appear more than once. Tap + to change the word length or set a word that is guessed for you at the start of every game.</p>
+  <div class="update">
+    <span id="verText"></span>
+    <button id="bUpdate" class="btn small">Check for updates</button>
+  </div>
+  <p id="updNote" class="note" role="status"></p>
   <div class="actions"><button class="btn primary" data-close>Got it</button></div>
 </dialog>
 
@@ -98,6 +102,7 @@
   <div class="actions"><button class="btn primary" data-close>Close</button></div>
 </dialog>
 
+<script src="version.js"></script>
 <script src="words.js"></script>
 <script src="app.js"></script>
 </body>

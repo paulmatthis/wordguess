@@ -1,6 +1,7 @@
 package app.wordguess;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.WebResourceRequest;
@@ -15,9 +16,10 @@ import java.util.HashMap;
 
 /**
  * Shows the game (the files from docs/, packed into the app) in a full-screen
- * web view. Nothing is loaded from the internet; the app has no network
- * permission. The made-up address below only exists so the page has a normal
- * https origin, which keeps saved games and statistics working.
+ * web view. The game itself is never loaded from the internet; the only time
+ * the app goes online is when "Check for updates" is tapped. The made-up
+ * address below only exists so the page has a normal https origin, which
+ * keeps saved games and statistics working.
  */
 public class MainActivity extends Activity {
     private static final String BASE = "https://wordguess.invalid/";
@@ -37,6 +39,16 @@ public class MainActivity extends Activity {
         settings.setDomStorageEnabled(true);
 
         web.setWebViewClient(new WebViewClient() {
+            // Links that leave the game (the update download) open in the browser.
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                if (request.getUrl().toString().startsWith(BASE)) return false;
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, request.getUrl()));
+                } catch (RuntimeException e) { /* no browser installed */ }
+                return true;
+            }
+
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                 String url = request.getUrl().toString();

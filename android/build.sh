@@ -14,6 +14,7 @@ mkdir -p build/res/mipmap-xxxhdpi build/assets/www build/classes build/dex
 cp ../docs/icons/icon-192.png build/res/mipmap-xxxhdpi/ic_launcher.png
 cp -R ../docs/. build/assets/www/
 rm -f build/assets/www/sw.js   # browser-only offline support; the app is already offline
+echo "const APP_VERSION = $VERSION;" > build/assets/www/version.js   # for "Check for updates"
 
 "$BT/aapt2" compile --dir build/res -o build/res.zip
 "$BT/aapt2" link -o build/unaligned.apk -I "$JAR" --manifest AndroidManifest.xml \
