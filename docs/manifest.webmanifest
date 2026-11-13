@@ -1,7 +1,7 @@
 {
   "name": "Word Guess",
   "short_name": "Word Guess",
-  "start_url": "./",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
