@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Word Guess</title>
+<meta name="theme-color" content="#2b2d31" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f3f3f1" media="(prefers-color-scheme: light)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Word Guess">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+  <header>
+    <button id="bInfo" class="icon" aria-label="How to play">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="7.6" r="1.4" fill="currentColor"/><rect x="10.9" y="10.5" width="2.2" height="7" rx="1" fill="currentColor"/></svg>
+    </button>
+    <button id="bStats" class="icon" aria-label="Statistics">
+      <svg viewBox="0 0 24 24"><rect x="3.5" y="12" width="4" height="8.5" rx="1" fill="currentColor"/><rect x="10" y="4" width="4" height="16.5" rx="1" fill="currentColor"/><rect x="16.5" y="8.5" width="4" height="12" rx="1" fill="currentColor"/></svg>
+    </button>
+    <button id="bNew" class="icon" aria-label="New game and options">
+      <svg viewBox="0 0 24 24"><path d="M12 4v16M4 12h16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>
+    </button>
+  </header>
+
+  <main id="wrap"><div id="board" aria-label="Guesses"></div></main>
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <footer>
+    <div id="kb"></div>
+    <div id="result" hidden>
+      <div id="resTitle"></div>
+      <div id="resWord"></div>
+      <div class="actions">
+        <button id="bShare" class="btn">Share</button>
+        <button id="bAgain" class="btn primary">New game</button>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<dialog id="dStart">
+  <h2>New game</h2>
+  <label class="field">
+    <span>Word length</span>
+    <select id="selLen">
+      <option value="3">3 letters</option>
+      <option value="4">4 letters</option>
+      <option value="5">5 letters</option>
+      <option value="6">6 letters</option>
+      <option value="7">7 letters</option>
+      <option value="rand">Random</option>
+    </select>
+  </label>
+  <label class="check">
+    <input type="checkbox" id="chkAuto">
+    <span>Always start with my word</span>
+  </label>
+  <input type="text" id="inpAuto" inputmode="text" autocomplete="off" autocorrect="off"
+         autocapitalize="characters" spellcheck="false" aria-label="Starting word">
+  <p id="autoNote" class="note"></p>
+  <div class="actions">
+    <button id="bCancel" class="btn">Cancel</button>
+    <button id="bStart" class="btn primary">Start game</button>
+  </div>
+</dialog>
+
+<dialog id="dInfo">
+  <h2>How to play</h2>
+  <p>Guess the hidden word in 6 tries. Type a word and press Enter.</p>
+  <p><span class="tile mini c">G</span> right letter, right place</p>
+  <p><span class="tile mini p">O</span> right letter, wrong place</p>
+  <p><span class="tile mini a">B</span> letter is not in the word</p>
+  <p class="note">Letters can appear more than once. Tap + to change the word length or set a word that is guessed for you at the start of every game.</p>
+  <div class="actions"><button class="btn primary" data-close>Got it</button></div>
+</dialog>
+
+<dialog id="dStats">
+  <h2>Statistics</h2>
+  <label class="field">
+    <span>Games</span>
+    <select id="selStats">
+      <option value="all">All lengths</option>
+      <option value="3">3 letters</option>
+      <option value="4">4 letters</option>
+      <option value="5">5 letters</option>
+      <option value="6">6 letters</option>
+      <option value="7">7 letters</option>
+    </select>
+  </label>
+  <div id="statNums"></div>
+  <div id="statDist"></div>
+  <div class="actions"><button class="btn primary" data-close>Close</button></div>
+</dialog>
+
+<script src="words.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
