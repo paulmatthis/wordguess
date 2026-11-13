@@ -99,9 +99,9 @@ header {
 .tile.p { --c: var(--present); }
 .tile.a { --c: var(--absent); }
 .tile.c, .tile.p, .tile.a { background: var(--c); border-color: var(--c); color: #fff; }
-.tile.pop { animation: pop 0.1s ease-out; }
-.tile.flip { animation: flip 0.45s ease both; }
-.row.shake { animation: shake 0.35s; }
+.tile.pop { animation: pop 0.06s ease-out; }
+.tile.flip { animation: flip 0.16s ease both; }
+.row.shake { animation: shake 0.2s; }
 @keyframes pop { from { transform: scale(0.85); } }
 @keyframes flip {
   0%, 49% { background: transparent; border-color: var(--line-active); color: var(--text); }

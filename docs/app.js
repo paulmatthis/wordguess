@@ -81,7 +81,7 @@ function renderBoard(opt = {}) {
     for (let i = 0; i < g.n; i++) {
       let cls = 'tile', style = '';
       if (marks) cls += ' ' + marks[i];
-      if (flip) { cls += ' flip'; style = ` style="animation-delay:${i * 110}ms"`; }
+      if (flip) { cls += ' flip'; style = ` style="animation-delay:${i * 25}ms"`; }
       if (active && opt.pop && i === word.length - 1) cls += ' pop';
       html += `<div class="${cls}"${style}>${word[i] || ''}</div>`;
     }
@@ -97,8 +97,8 @@ function buildKeyboard() {
     `<div class="krow${i === 1 ? ' inset' : i === 2 ? ' wide' : ''}">` +
     [...row].map(k => `<button class="key" data-k="${k}">${k.toUpperCase()}</button>`).join('') +
     '</div>').join('') +
-    '<div class="krow"><button class="key" data-k="enter">Enter</button>' +
-    '<button class="key" data-k="back">Delete</button></div>';
+    '<div class="krow"><button class="key" data-k="back">Delete</button>' +
+    '<button class="key" data-k="enter">Enter</button></div>';
   // pointerdown (not click) so fast two-thumb typing never drops a letter
   kb.addEventListener('pointerdown', e => {
     const key = e.target.closest('.key');
@@ -179,7 +179,7 @@ async function submit() {
 
   busy = true;
   renderBoard({ reveal: true });
-  await sleep(g.n * 110 + 450);
+  await sleep(g.n * 25 + 180);
   busy = false;
   if (S.game !== g) return;
   renderKeys();
@@ -212,11 +212,11 @@ async function newGame() {
 
   // Play the saved starting word automatically.
   busy = true;
-  await sleep(300);
+  await sleep(80);
   if (S.game !== g) { busy = false; return; }
   g.cur = first;
   renderBoard();
-  await sleep(250);
+  await sleep(80);
   busy = false;
   if (S.game === g) submit();
 }

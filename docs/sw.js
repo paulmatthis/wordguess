@@ -1,7 +1,7 @@
 // Offline support: everything the game needs is stored on the phone the first
 // time it is opened. Afterwards it loads from that copy, and quietly refreshes
 // the copy in the background whenever there happens to be a connection.
-const CACHE = 'wordguess-v3';
+const CACHE = 'wordguess-v4';
 const FILES = [
   './', 'index.html', 'styles.css', 'app.js', 'words.js', 'manifest.webmanifest',
   'dict/3.txt', 'dict/4.txt', 'dict/5.txt', 'dict/6.txt', 'dict/7.txt',
