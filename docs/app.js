@@ -133,6 +133,16 @@ function showResult() {
   $('resWord').textContent = g.answer;
   $('bShare').textContent = 'Share';
   dResult.showModal();
+  placeResult();
+}
+
+// Line the popup's top up with the top of the keyboard, so it covers the
+// keyboard and leaves the whole board in view (for screenshots).
+function placeResult() {
+  if (!dResult.open) return;
+  const room = window.innerHeight - dResult.offsetHeight - 8;
+  const top = Math.max(8, Math.min(kb.getBoundingClientRect().top, room));
+  dResult.style.margin = `${Math.round(top)}px auto 0`;
 }
 
 function renderAll() {
@@ -385,7 +395,7 @@ document.addEventListener('keydown', e => {
   else if (/^[a-zA-Z]$/.test(e.key)) press(e.key.toLowerCase());
 });
 
-window.addEventListener('resize', fit);
+window.addEventListener('resize', () => { fit(); placeResult(); });
 if (window.ResizeObserver) new ResizeObserver(fit).observe(wrap);
 
 // ---------- start ----------

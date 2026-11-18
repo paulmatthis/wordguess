@@ -168,7 +168,7 @@ footer { padding: 4px 4px 8px; }
 }
 
 /* End-of-game popup: sits over the keyboard so the board stays in view. */
-#dResult { text-align: center; margin-bottom: calc(env(safe-area-inset-bottom) + 14px); }
+#dResult { text-align: center; margin: auto auto 0; }
 #dResult::backdrop { background: rgba(0, 0, 0, 0.3); }
 #resTitle { color: var(--muted); font-size: 16px; }
 #resWord { font-size: 30px; font-weight: 800; letter-spacing: 0.12em; margin: 4px 0 14px; text-transform: uppercase; }
