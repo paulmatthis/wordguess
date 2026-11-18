@@ -136,12 +136,13 @@ function showResult() {
   placeResult();
 }
 
-// Line the popup's top up with the top of the keyboard, so it covers the
-// keyboard and leaves the whole board in view (for screenshots).
+// Float the popup a little above the keyboard's top edge, mostly covering the
+// keyboard, but below the board so the whole board stays in view (for screenshots).
 function placeResult() {
   if (!dResult.open) return;
   const room = window.innerHeight - dResult.offsetHeight - 8;
-  const top = Math.max(8, Math.min(kb.getBoundingClientRect().top, room));
+  const want = Math.max(board.getBoundingClientRect().bottom + 10, kb.getBoundingClientRect().top - 48);
+  const top = Math.max(8, Math.min(want, room));
   dResult.style.margin = `${Math.round(top)}px auto 0`;
 }
 
